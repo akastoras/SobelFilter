@@ -1,3 +1,10 @@
+/*
+ * Description: Implementation of Sobel Filter for detecting
+ * edges on .pgm images.
+ * Author: Athanasios Kastoras | University of Thessaly
+ * Email: akastoras@uth.gr
+ */
+
 #include "pgm.h"
 #include <string.h>
 #include <stdio.h>

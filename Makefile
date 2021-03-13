@@ -7,8 +7,6 @@ OBJFILES = pgm.o sobel_filter.o
 # define the executable file's name
 MAIN     = sobel_filter
 
-# all of the below is generic - one typically only adjusts the above
-
 all: $(MAIN)
 
 $(MAIN): $(OBJFILES)

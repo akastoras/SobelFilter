@@ -4,6 +4,7 @@
 #include <assert.h>
 
 
+
 /* Create a new empty image with the given characteristics */
 pgm_t *new_pgm_image(const int width, const int height, const int maxval)
 {
@@ -19,6 +20,8 @@ pgm_t *new_pgm_image(const int width, const int height, const int maxval)
 	return image;
 }
 
+
+/* Check if comments exist where the fp is, if so move past them */
 void skip_comments(FILE *file)
 {
 	char c;
@@ -32,6 +35,7 @@ void skip_comments(FILE *file)
 	}
 }
 
+
 /* Load an image from a file */
 pgm_t *load_pgm_image(const char *filename)
 {
@@ -42,10 +46,10 @@ pgm_t *load_pgm_image(const char *filename)
 	char m1, m2;
 
 	
-	/* Initialize image metadata */
+	/* Read image metadata */
 	skip_comments(file);
 	fscanf(file, "%c%c", &m1, &m2);
-	assert(m1 == 'P' && m2 == '5');
+	assert(m1 == 'P' && m2 == '5'); // Possible change: if m2 == 2: read ascii format
 
 	skip_comments(file);
 	fscanf(file, " %s", width_string);
@@ -63,6 +67,7 @@ pgm_t *load_pgm_image(const char *filename)
 	/* Create empty image */
 	pgm_t *image = new_pgm_image(width, height, maxval);
 
+
 	/* Read image content, ignore comments */
 	skip_comments(file);
 	fread(image->pixels, image->width * image->height, 1, file);
@@ -75,6 +80,7 @@ pgm_t *load_pgm_image(const char *filename)
 /* Store an image to a file */
 void store_pgm_image(pgm_t *image, char *filename)
 {
+	/* Open File */
 	assert(image && image->pixels);
 	FILE *file = fopen(filename, "wb");
 	assert(file);
@@ -84,11 +90,7 @@ void store_pgm_image(pgm_t *image, char *filename)
 	fprintf(file, "%d %d\n%d\n", image->width, image->height, image->maxval);
 
 	/* Store the image content */
-	for (int i = 0; i < image->height; ++i) {
-		for (int j = 0; j < image->width; ++j) {
-			fprintf(file, "%c", image->pixels[i*image->width + j]);
-		}
-	}
+	fwrite(image->pixels, image->width * image->height, 1, file);
 
 	fclose(file);
 }

@@ -11,7 +11,7 @@ typedef struct pgm_image {
 	int width;
 	int height;
 	int maxval;
-	unsigned char *pixels;
+	unsigned char *pixels; // Each Pixel is represented by a value from 0 (black) to maxval (white)
 } pgm_t;
 
 

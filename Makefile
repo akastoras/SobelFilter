@@ -10,13 +10,13 @@ MAIN     = sobel_filter
 all: $(MAIN)
 
 $(MAIN): $(OBJFILES)
-	$(CC) $(CFIAGS) -o $(MAIN) $(OBJFILES)
+	$(CC) $(CFIAGS) -o $(MAIN) $(OBJFILES) -lm
 	
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm *.o
+	rm *.o images/*_new.pgm
 
 run_img01:
 	./sobel_filter images/img0001.pgm images/img0001_new.pgm

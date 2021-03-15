@@ -78,7 +78,7 @@ pgm_t *load_pgm_image(const char *filename)
 
 
 /* Store an image to a file */
-void store_pgm_image(pgm_t *image, char *filename)
+void store_pgm_image(const pgm_t *image, const char *filename)
 {
 	/* Open File */
 	assert(image && image->pixels);

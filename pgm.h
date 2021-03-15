@@ -4,8 +4,8 @@
  * Email: akastoras@uth.gr
  */
 
-#ifndef __PGM__H
-#define __PGM__H
+#ifndef __PGM_H_
+#define __PGM_H_
 
 typedef struct pgm_image {
 	int width;
@@ -18,7 +18,7 @@ typedef struct pgm_image {
 /* Functions */
 pgm_t *new_pgm_image(const int width, const int height, const int maxval);
 pgm_t *load_pgm_image(const char *filename);
-void store_pgm_image(pgm_t *image, char *filename);
+void store_pgm_image(const pgm_t *image, const char *filename);
 
 
 #endif

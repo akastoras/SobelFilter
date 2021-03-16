@@ -6,7 +6,7 @@ In this project the main goal is to compare the excecution time of the Program w
 
 The profiling was done using the comand:
 ```
-$perf stat ./sobel_filter images/img0001.pgm images/img0001_new.pgm
+$ perf stat ./sobel_filter images/img0001.pgm images/img0001_new.pgm
 ```
 
 ## Results

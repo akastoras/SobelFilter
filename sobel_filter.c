@@ -62,10 +62,15 @@ pgm_t *sobel_filter(const pgm_t *image)
 }
 
 int main(int argc, char **argv) {
+	if (argc != 3) {
+		printf("Invalid Arguments!\n");
+		return 1;
+	}
+
 	pgm_t *image = load_pgm_image(argv[1]);
-
 	pgm_t *new_image = sobel_filter(image);
-
 	store_pgm_image(new_image, argv[2]);
+
+	return 0;
 }
 

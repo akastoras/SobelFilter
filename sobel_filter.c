@@ -58,7 +58,7 @@ pgm_t *sobel_filter(const pgm_t *image)
 				(y_kernel[2][2] * image->pixels[(x + 1)*width + (y + 1)])
         	);
 
-			new_image->pixels[x * width + y] = TRHESHOLD( sqrt(x_sum*x_sum + y_sum*y_sum), maxval);
+			new_image->pixels[x * width + y] = TRHESHOLD(x_sum + y_sum, maxval);
 		}
 	}
 

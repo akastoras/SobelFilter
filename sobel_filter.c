@@ -8,6 +8,7 @@
 #include "pgm.h"
 #include <stdio.h>
 #include <math.h>
+#include <omp.h>
 
 #define TRHESHOLD(a,max) ((a > max)? max: 0)
 
@@ -17,50 +18,55 @@ pgm_t *sobel_filter(const pgm_t *image)
 {	
 	const int x_kernel[3][3] = {
 		{-1, 0, 1},
-		{-5, 0, 5},
+		{-13, 0, 13},
 		{-1, 0, 1}
 	};
 	const int y_kernel[3][3] = {
-		{-1,-5,-1},
+		{-1,-13,-1},
 		{0, 0, 0},
-		{1, 5, 1}
+		{1, 13, 1}
 	};
-	int x_sum, y_sum;
-	const int height = image->height, width = image->width, maxval = image->maxval;
+	register int x_sum, y_sum;
+	const register int height = image->height, width = image->width;
+	const int maxval = image->maxval;
 	pgm_t *new_image = new_pgm_image(width, height, image->maxval);
+	
 
-
-	for (int x = 1; x < height - 1; ++x) {
-		for (int y = 1; y < width - 1; ++y) {
+	#pragma omp parallel for private(x_sum, y_sum) schedule(static, 1)
+	for (register int x = 1; x < height - 1; ++x) {
+		for (register int y = 1; y < width - 1; ++y) {
 			x_sum = (
 				(x_kernel[0][0] * image->pixels[(x - 1)*width + (y - 1)]) +
-				(x_kernel[0][1] * image->pixels[(x)*width + (y - 1)]) +
+				(x_kernel[0][1] * image->pixels[    (x)*width + (y - 1)]) +
 				(x_kernel[0][2] * image->pixels[(x + 1)*width + (y - 1)]) +
-				(x_kernel[1][0] * image->pixels[(x - 1)*width + (y)]) +
-				(x_kernel[1][1] * image->pixels[(x)*width + (y)]) +
-				(x_kernel[1][2] * image->pixels[(x + 1)*width + (y)]) +
+				(x_kernel[1][0] * image->pixels[(x - 1)*width +     (y)]) +
+				(x_kernel[1][1] * image->pixels[    (x)*width +     (y)]) +
+				(x_kernel[1][2] * image->pixels[(x + 1)*width +     (y)]) +
 				(x_kernel[2][0] * image->pixels[(x - 1)*width + (y + 1)]) +
-				(x_kernel[2][1] * image->pixels[(x)*width + (y + 1)]) +
+				(x_kernel[2][1] * image->pixels[    (x)*width + (y + 1)]) +
 				(x_kernel[2][2] * image->pixels[(x + 1)*width + (y + 1)])
         	);
 			y_sum = (
 				(y_kernel[0][0] * image->pixels[(x - 1)*width + (y - 1)]) +
-				(y_kernel[0][1] * image->pixels[(x)*width + (y - 1)]) +
+				(y_kernel[0][1] * image->pixels[    (x)*width + (y - 1)]) +
 				(y_kernel[0][2] * image->pixels[(x + 1)*width + (y - 1)]) +
-				(y_kernel[1][0] * image->pixels[(x - 1)*width + (y)]) +
-				(y_kernel[1][1] * image->pixels[(x)*width + (y)]) +
-				(y_kernel[1][2] * image->pixels[(x + 1)*width + (y)]) +
+				(y_kernel[1][0] * image->pixels[(x - 1)*width +     (y)]) +
+				(y_kernel[1][1] * image->pixels[    (x)*width +     (y)]) +
+				(y_kernel[1][2] * image->pixels[(x + 1)*width +     (y)]) +
 				(y_kernel[2][0] * image->pixels[(x - 1)*width + (y + 1)]) +
-				(y_kernel[2][1] * image->pixels[(x)*width + (y + 1)]) +
+				(y_kernel[2][1] * image->pixels[    (x)*width + (y + 1)]) +
 				(y_kernel[2][2] * image->pixels[(x + 1)*width + (y + 1)])
         	);
 
-			new_image->pixels[x * image->width + y] = TRHESHOLD( sqrt(x_sum*x_sum + y_sum*y_sum), maxval);
+			new_image->pixels[x * width + y] = TRHESHOLD( sqrt(x_sum*x_sum + y_sum*y_sum), maxval);
 		}
 	}
+
 	return new_image;
 }
 
+
+/* Create a new image with the  */
 int main(int argc, char **argv) {
 	if (argc != 3) {
 		printf("Invalid Arguments!\n");

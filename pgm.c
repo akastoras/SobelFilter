@@ -4,7 +4,6 @@
 #include <assert.h>
 
 
-
 /* Create a new empty image with the given characteristics */
 pgm_t *new_pgm_image(const int width, const int height, const int maxval)
 {
@@ -14,7 +13,7 @@ pgm_t *new_pgm_image(const int width, const int height, const int maxval)
 	image->width = width;
 	image->height = height;
 	image->maxval = maxval;
-	image->pixels = malloc(width * height * sizeof(unsigned char));
+	image->pixels = (unsigned char *) calloc(width * height, sizeof(unsigned char));
 	assert(image->pixels);
 
 	return image;

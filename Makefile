@@ -1,7 +1,7 @@
 # define compiler
-CC       = clang
+CC       = gcc
 # define compiler flags
-CFLAGS   = -Wall -g
+CFLAGS   = -Wall -g -fopenmp
 # define the object files that this project needs
 OBJFILES = pgm.o sobel_filter.o
 # define the executable file's name
@@ -10,11 +10,10 @@ MAIN     = sobel_filter
 all: $(MAIN)
 
 $(MAIN): $(OBJFILES)
-	$(CC) $(CFIAGS) -o $(MAIN) $(OBJFILES) -lm
+	$(CC) $(CFLAGS) -o $(MAIN) $(OBJFILES) -lm
 	
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $<
-
 clean:
 	rm *.o images/*_new.pgm
 

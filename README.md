@@ -13,7 +13,7 @@ $ perf stat ./sobel_filter images/img0001.pgm images/img0001_new.pgm
 ## Results
 The results of the comparison are shown below:
 
-![comparison](https://user-images.githubusercontent.com/57157508/111668425-67fd9300-881e-11eb-9724-5da3c5ffbfc6.png)
+![comparison](https://user-images.githubusercontent.com/57157508/111672954-24595800-8823-11eb-9209-382be901311d.png)
 
 ## Other Optimizations
 Other optimizations include:

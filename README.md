@@ -20,3 +20,4 @@ Other optimizations include:
  * Using registers to store the most used variables
  * Combining the two outputs using Manhatan distance instead of Eucledian
  * Instead of multiplying with 2, shifting by 1
+ * Removing unnesessary commands, such as `a * 1`, or `a + b * 0`

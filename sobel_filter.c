@@ -12,52 +12,55 @@
 
 #define TRHESHOLD(a,max) ((a > max)? max: 0)
 
-
-// https://en.wikipedia.org/wiki/Sobel_operator
+/* Implementation of Sobel Operator on pgm_t images */
 pgm_t *sobel_filter(const pgm_t *image)
 {	
-	const int x_kernel[3][3] = {
-		{-1, 0, 1},
-		{-13, 0, 13},
-		{-1, 0, 1}
-	};
-	const int y_kernel[3][3] = {
-		{-1,-13,-1},
-		{0, 0, 0},
-		{1, 13, 1}
-	};
+	/* Variable Declaration */
 	register int x_sum, y_sum;
 	const register int height = image->height, width = image->width;
 	const int maxval = image->maxval;
 	pgm_t *new_image = new_pgm_image(width, height, image->maxval);
 	
 
+	/* Parallelizing using OpenMP */
+	/* Give an entire row to a single thread to increase cache performance */
 	#pragma omp parallel for private(x_sum, y_sum) schedule(static, 1)
 	for (register int x = 1; x < height - 1; ++x) {
+		/* 
+		 * Apply the Sobel Filter's kernel convolution
+		 * on each pixel of a single row.
+		 * Convolution matrices:
+		 * X:
+		 * -1  0  1
+		 * -2  0  2
+		 * -1  0  1
+		 * Y:
+		 * -1 -2 -1
+		 *  0  0  0
+		 *  1  2  1
+		 * Convolve with X to get Gx and with Y to get Gy
+		 * The final pixel value is the Eucledian norm of Gx and Gy
+		 */
 		for (register int y = 1; y < width - 1; ++y) {
 			x_sum = (
-				(x_kernel[0][0] * image->pixels[(x - 1)*width + (y - 1)]) +
-				(x_kernel[0][1] * image->pixels[    (x)*width + (y - 1)]) +
-				(x_kernel[0][2] * image->pixels[(x + 1)*width + (y - 1)]) +
-				(x_kernel[1][0] * image->pixels[(x - 1)*width +     (y)]) +
-				(x_kernel[1][1] * image->pixels[    (x)*width +     (y)]) +
-				(x_kernel[1][2] * image->pixels[(x + 1)*width +     (y)]) +
-				(x_kernel[2][0] * image->pixels[(x - 1)*width + (y + 1)]) +
-				(x_kernel[2][1] * image->pixels[    (x)*width + (y + 1)]) +
-				(x_kernel[2][2] * image->pixels[(x + 1)*width + (y + 1)])
-        	);
-			y_sum = (
-				(y_kernel[0][0] * image->pixels[(x - 1)*width + (y - 1)]) +
-				(y_kernel[0][1] * image->pixels[    (x)*width + (y - 1)]) +
-				(y_kernel[0][2] * image->pixels[(x + 1)*width + (y - 1)]) +
-				(y_kernel[1][0] * image->pixels[(x - 1)*width +     (y)]) +
-				(y_kernel[1][1] * image->pixels[    (x)*width +     (y)]) +
-				(y_kernel[1][2] * image->pixels[(x + 1)*width +     (y)]) +
-				(y_kernel[2][0] * image->pixels[(x - 1)*width + (y + 1)]) +
-				(y_kernel[2][1] * image->pixels[    (x)*width + (y + 1)]) +
-				(y_kernel[2][2] * image->pixels[(x + 1)*width + (y + 1)])
-        	);
+				image->pixels[(x + 1)*width + (y + 1)] -
+				image->pixels[(x + 1)*width + (y - 1)] +
+				(image->pixels[    (x)*width + (y + 1)] << 1) -
+				(image->pixels[    (x)*width + (y - 1)] << 1) +
+				image->pixels[(x - 1)*width + (y + 1)] -
+				image->pixels[(x - 1)*width + (y - 1)]
+			);
 
+			y_sum = (
+				image->pixels[(x + 1)*width + (y + 1)] +
+				(image->pixels[(x + 1)*width +     (y)] << 1) +
+				image->pixels[(x + 1)*width + (y - 1)] -
+				image->pixels[(x - 1)*width + (y + 1)] -
+				(image->pixels[(x - 1)*width +     (y)] << 1) -
+				image->pixels[(x - 1)*width + (y - 1)]
+			);
+
+			// Manhatan Distance is used instead of Eucledian to increase performance
 			new_image->pixels[x * width + y] = TRHESHOLD(x_sum + y_sum, maxval);
 		}
 	}
@@ -66,16 +69,16 @@ pgm_t *sobel_filter(const pgm_t *image)
 }
 
 
-/* Create a new image with the  */
+/* Driver program to test sobel_filter function */
 int main(int argc, char **argv) {
 	if (argc != 3) {
 		printf("Invalid Arguments!\n");
 		return 1;
 	}
 
-	pgm_t *image = load_pgm_image(argv[1]);
-	pgm_t *new_image = sobel_filter(image);
-	store_pgm_image(new_image, argv[2]);
+	pgm_t *image = load_pgm_image(argv[1]); // Load an Image
+	pgm_t *new_image = sobel_filter(image); // Implement sobel_filter()
+	store_pgm_image(new_image, argv[2]);	// Store in a new image
 
 	return 0;
 }

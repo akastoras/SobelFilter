@@ -5,7 +5,7 @@ For more information on [Kernel Convolution](https://en.wikipedia.org/wiki/Kerne
 
 In this project the main goal is to compare the excecution time of the Program when using OpenMP to parallelize the computation and when not.
 
-The profiling was done using the comand on a Linux machine with a Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz:
+The profiling was done using the following comand on a Linux machine with a Intel(R) Core(TM) i5-8265U CPU @ 1.60GHz:
 ```
 $ perf stat ./sobel_filter images/img0001.pgm images/img0001_new.pgm
 ```

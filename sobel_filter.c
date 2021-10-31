@@ -10,7 +10,7 @@
 #include <math.h>
 #include <omp.h>
 
-#define TRHESHOLD(a,max) ((a > max)? max: 0)
+#define THRESHOLD(a,max) ((a > max)? max: 0)
 
 /* Implementation of Sobel Operator on pgm_t images */
 pgm_t *sobel_filter(const pgm_t *image)
@@ -61,7 +61,7 @@ pgm_t *sobel_filter(const pgm_t *image)
 			);
 
 			// Manhatan Distance is used instead of Eucledian to increase performance
-			new_image->pixels[x * width + y] = TRHESHOLD(x_sum + y_sum, maxval);
+			new_image->pixels[x * width + y] = THRESHOLD(x_sum + y_sum, maxval);
 		}
 	}
 

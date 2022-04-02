@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <omp.h>
+#include <string.h>
 
 #define THRESHOLD(a,max) ((a > max)? max: 0)
 
@@ -45,19 +46,19 @@ pgm_t *sobel_filter(const pgm_t *image)
 			x_sum = (
 				image->pixels[(x + 1)*width + (y + 1)] -
 				image->pixels[(x + 1)*width + (y - 1)] +
-				(image->pixels[    (x)*width + (y + 1)] << 1) -
-				(image->pixels[    (x)*width + (y - 1)] << 1) +
+				(image->pixels[   (x)*width + (y + 1)] << 1) -
+				(image->pixels[   (x)*width + (y - 1)] << 1) +
 				image->pixels[(x - 1)*width + (y + 1)] -
 				image->pixels[(x - 1)*width + (y - 1)]
 			);
 
 			y_sum = (
-				image->pixels[(x + 1)*width + (y + 1)] +
-				(image->pixels[(x + 1)*width +     (y)] << 1) +
-				image->pixels[(x + 1)*width + (y - 1)] -
-				image->pixels[(x - 1)*width + (y + 1)] -
-				(image->pixels[(x - 1)*width +     (y)] << 1) -
-				image->pixels[(x - 1)*width + (y - 1)]
+				image->pixels[ (x + 1)*width + (y + 1)] +
+				(image->pixels[(x + 1)*width + (y)    ] << 1) +
+				image->pixels[ (x + 1)*width + (y - 1)] -
+				image->pixels[ (x - 1)*width + (y + 1)] -
+				(image->pixels[(x - 1)*width + (y)    ] << 1) -
+				image->pixels[ (x - 1)*width + (y - 1)]
 			);
 
 			// Manhatan Distance is used instead of Eucledian to increase performance
@@ -76,7 +77,15 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	pgm_t *image = load_pgm_image(argv[1]); // Load an Image
+	pgm_t *image;
+
+	if (strcmp(argv[1], "-r") == 0) {
+		image = new_pgm_image(1024, 1024, 8);
+		rand_pgm_image(image);
+	}
+	else {
+		image = load_pgm_image(argv[1]); // Load an Image
+	}
 	pgm_t *new_image = sobel_filter(image); // Implement sobel_filter()
 	store_pgm_image(new_image, argv[2]);	// Store in a new image
 

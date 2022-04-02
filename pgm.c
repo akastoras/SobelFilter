@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-
 /* Create a new empty image with the given characteristics */
 pgm_t *new_pgm_image(const int width, const int height, const int maxval)
 {
@@ -17,6 +16,17 @@ pgm_t *new_pgm_image(const int width, const int height, const int maxval)
 	assert(image->pixels);
 
 	return image;
+}
+
+/* Fill an image with random pixels. width, height
+ and maxval fields should be initialized properly */
+void rand_pgm_image(pgm_t *image)
+{
+	for (int i = 0; i < image->width; i++) {
+		for (int j = 0; j < image->height; j++) {
+			image->pixels[i*image->width + j] = (unsigned char) rand() % image->maxval;
+		}
+	}
 }
 
 

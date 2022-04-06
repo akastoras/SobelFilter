@@ -8,6 +8,7 @@
 #include "pgm.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include <omp.h>
 #include <string.h>
 
@@ -26,7 +27,7 @@ pgm_t *sobel_filter(const pgm_t *image)
 	/* Parallelizing using OpenMP */
 	/* Give an entire row to a single thread to increase cache performance */
 	#pragma omp parallel for private(x_sum, y_sum) schedule(static, 1)
-	for (register int x = 1; x < height - 1; ++x) {
+	for (register int x = 1; x < height - 1; x++) {
 		/* 
 		 * Apply the Sobel Filter's kernel convolution
 		 * on each pixel of a single row.
@@ -42,7 +43,7 @@ pgm_t *sobel_filter(const pgm_t *image)
 		 * Convolve with X to get Gx and with Y to get Gy
 		 * The final pixel value is the Eucledian norm of Gx and Gy
 		 */
-		for (register int y = 1; y < width - 1; ++y) {
+		for (register int y = 1; y < width - 1; y++) {
 			x_sum = (
 				image->pixels[(x + 1)*width + (y + 1)] -
 				image->pixels[(x + 1)*width + (y - 1)] +
@@ -62,7 +63,7 @@ pgm_t *sobel_filter(const pgm_t *image)
 			);
 
 			// Manhatan Distance is used instead of Eucledian to increase performance
-			new_image->pixels[x * width + y] = THRESHOLD(x_sum + y_sum, maxval);
+			new_image->pixels[x * width + y] = THRESHOLD(abs(x_sum) + abs(y_sum), maxval);
 		}
 	}
 
@@ -72,7 +73,7 @@ pgm_t *sobel_filter(const pgm_t *image)
 
 /* Driver program to test sobel_filter function */
 int main(int argc, char **argv) {
-	if (argc != 3) {
+	if (argc < 3) {
 		printf("Invalid Arguments!\n");
 		return 1;
 	}
@@ -83,12 +84,27 @@ int main(int argc, char **argv) {
 		image = new_pgm_image(1024, 1024, 8);
 		rand_pgm_image(image);
 	}
+	else if (strcmp(argv[1], "--std-test") == 0) {
+		image = new_pgm_image(256, 256, 255);
+		fill_pgm_image(image);
+		
+		pgm_t *new_image = sobel_filter(image); // Implement sobel_filter()
+		store_pgm_image(new_image, argv[2]);	// Store in a new image
+
+		bool checked = check_pgm_image(new_image);
+
+		printf(checked
+		? "The image was filtered correctly!\n"
+		: "The image was not filtered correctly!\n");
+	}
 	else {
 		image = load_pgm_image(argv[1]); // Load an Image
 	}
+
 	pgm_t *new_image = sobel_filter(image); // Implement sobel_filter()
 	store_pgm_image(new_image, argv[2]);	// Store in a new image
 
+	
 	return 0;
 }
 

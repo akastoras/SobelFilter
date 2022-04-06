@@ -17,6 +17,9 @@ $(MAIN): $(OBJFILES)
 clean:
 	rm *.o images/*_new.pgm
 
+std:
+	./sobel_filter --std-test images/square_filled.pgm images/square_empty.pgm 
+
 run_img01:
 	./sobel_filter images/img0001.pgm images/img0001_new.pgm
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdbool.h>
 
 /* Create a new empty image with the given characteristics */
 pgm_t *new_pgm_image(const int width, const int height, const int maxval)
@@ -102,4 +103,54 @@ void store_pgm_image(const pgm_t *image, const char *filename)
 	fwrite(image->pixels, image->width * image->height, 1, file);
 
 	fclose(file);
+}
+
+/* Create a white square at the center of the image */
+void fill_pgm_image(pgm_t *image)
+{
+	for (int i = 0; i < image->height; i++) {
+		for (int j = 0; j < image->width; j++) {
+			if (i > image->height/4 && i < image->height*3/4
+				&& j > image->width/4 && j < image->width*3/4) 
+			{
+				image->pixels[i*image->width + j] = image->maxval;
+			}
+			else {
+				image->pixels[i*image->width + j] = 0;
+			}
+		}
+	}
+}
+
+/* Check to see if the filtered image is 
+an empty sqare at the center of the image*/
+bool check_pgm_image(pgm_t *image)
+{
+	for (int i = 0; i < image->height; i++) {
+		for (int j = 0; j < image->width; j++) {
+
+			bool is_in_square_i = (i == image->height/4 || i == image->height/4 + 1
+			 			|| i == image->height*3/4 || i == image->height*3/4 - 1)
+						&& (j >= image->width/4 && j <= image->width*3/4);
+
+			bool is_in_square_j = (j == image->height/4 || j == image->height/4 + 1
+			 			|| j == image->height*3/4 || j == image->height*3/4 - 1)
+						&& (i >= image->height/4 && i <= image->height*3/4);
+			
+			if (is_in_square_i || is_in_square_j) {
+				printf("In square: %d %d -> %d\n", i, j, image->pixels[i*image->width + j]);
+				if (image->pixels[i*image->width + j] == 0) {
+					return false;
+				}
+			}
+			else {
+				printf("Out of square: %d %d -> %d\n", i, j, image->pixels[i*image->width + j]);
+				if (image->pixels[i*image->width + j] != 0) {
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
 }
